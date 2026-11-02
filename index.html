@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Evita barras de desplazamiento al moverse el botón */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        .botones {
+            display: flex;
+            gap: 30px;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        #btnSi {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        #btnSi:hover {
+            background-color: #27ae60;
+        }
+
+        #btnNo {
+            background-color: #e74c3c;
+            color: white;
+            position: absolute; /* Permite moverlo libremente por el contenedor/pantalla */
+            transition: transform 0.1s ease-out; /* Movimiento fluido */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>¿Eres gay?</h1>
+
+    <div class="botones" id="contenedorBotones">
+        <button id="btnSi" onclick="alert('¡Sabía que dirías que sí! ❤️')">SÍ</button>
+        <button id="btnNo">NO</button>
+    </div>
+
+    <script>
+        const btnNo = document.getElementById('btnNo');
+
+        function moverBoton() {
+            // Obtenemos las dimensiones de la ventana
+            const anchoVentana = window.innerWidth;
+            const altoVentana = window.innerHeight;
+
+            // Obtenemos el tamaño del botón
+            const anchoBoton = btnNo.offsetWidth;
+            const altoBoton = btnNo.offsetHeight;
+
+            // Margen de seguridad para que no quede pegado exactamente al borde
+            const margen = 50;
+
+            // Calculamos posiciones aleatorias dentro de la pantalla
+            const randomX = Math.random() * (anchoVentana - anchoBoton - margen * 2) + margen;
+            const randomY = Math.random() * (altoVentana - altoBoton - margen * 2) + margen;
+
+            // Aplicamos la nueva posición usando position absolute
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = `${randomX}px`;
+            btnNo.style.top = `${randomY}px`;
+        }
+
+        // Eventos para cuando el cursor pasa por encima (PC)
+        btnNo.addEventListener('mouseover', moverBoton);
+
+        // Eventos para pantallas táctiles (Celulares y tablets)
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita que se registre el toque y active el botón
+            moverBoton();
+        });
+    </script>
+
+</body>
+</html>
