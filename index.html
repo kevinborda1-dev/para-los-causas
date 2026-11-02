@@ -54,7 +54,7 @@
             border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.2s;
         }
 
         .btn-si {
@@ -75,7 +75,7 @@
             background-color: #c0392b;
         }
 
-        /* Clase para el botón que se escapa */
+        /* Clase para los botones que se escapan */
         .escapista {
             position: absolute !important;
             transition: all 0.1s ease-out;
@@ -93,7 +93,7 @@
         <div id="seccion1">
             <h1>¿Eres gay?</h1>
             <div class="botones" id="contenedor1">
-                <button class="btn-si" onclick="siguientePregunta()">SÍ</button>
+                <button class="btn-si" id="btnSi1">SÍ</button>
                 <button class="btn-no" id="btnNo1">NO</button>
             </div>
         </div>
@@ -103,7 +103,7 @@
             <h1>¿Y tu familia lo sabe?</h1>
             <div class="botones" id="contenedor2">
                 <button class="btn-si" id="btnSi2">SÍ</button>
-                <button class="btn-no" onclick="finalizar()">NO</button>
+                <button class="btn-no" id="btnNo2">NO</button>
             </div>
         </div>
 
@@ -115,56 +115,48 @@
     </div>
 
     <script>
-        // --- CONFIGURACIÓN PREGUNTA 1 (Se escapa el NO) ---
-        const btnNo1 = document.getElementById('btnNo1');
-        
-        function moverBoton1(e) {
-            if (e) e.preventDefault();
-            const ancho = window.innerWidth - btnNo1.offsetWidth - 40;
-            const alto = window.innerHeight - btnNo1.offsetHeight - 40;
-            const randomX = Math.random() * ancho;
-            const randomY = Math.random() * alto;
+        // Función genérica para hacer que cualquier botón se escape
+        function hacerEscapista(idBoton, callbackAlDarClick) {
+            const btn = document.getElementById(idBoton);
 
-            btnNo1.classList.add('escapista');
-            btnNo1.style.left = `${randomX}px`;
-            btnNo1.style.top = `${randomY}px`;
+            function mover(e) {
+                if (e) e.preventDefault();
+                const ancho = window.innerWidth - btn.offsetWidth - 40;
+                const alto = window.innerHeight - btn.offsetHeight - 40;
+                const randomX = Math.random() * ancho;
+                const randomY = Math.random() * alto;
+
+                btn.classList.add('escapista');
+                btn.style.left = `${randomX}px`;
+                btn.style.top = `${randomY}px`;
+            }
+
+            btn.addEventListener('mouseover', mover);
+            btn.addEventListener('touchstart', mover);
+
+            // Por si milagrosamente logran hacerle clic/touch directo
+            if (callbackAlDarClick) {
+                btn.addEventListener('click', callbackAlDarClick);
+            }
         }
 
-        btnNo1.addEventListener('mouseover', moverBoton1);
-        btnNo1.addEventListener('touchstart', moverBoton1);
+        // --- CONFIGURACIÓN PREGUNTA 1 (Ambos se escapan, el SÍ avanza a la siguiente pregunta) ---
+        hacerEscapista('btnSi1', siguientePregunta);
+        hacerEscapista('btnNo1', siguientePregunta); // Si logran darle al No, también avanza por diversión
 
         // --- TRANSICIÓN A LA SEGUNDA PREGUNTA ---
         function siguientePregunta() {
             document.getElementById('seccion1').classList.add('hidden');
             document.getElementById('seccion2').classList.remove('hidden');
-            configurarBotonSi2();
-        }
-
-        // --- CONFIGURACIÓN PREGUNTA 2 (Se escapa el SÍ) ---
-        function configurarBotonSi2() {
-            const btnSi2 = document.getElementById('btnSi2');
-
-            function moverBotonSi2(e) {
-                if (e) e.preventDefault();
-                const ancho = window.innerWidth - btnSi2.offsetWidth - 40;
-                const alto = window.innerHeight - btnSi2.offsetHeight - 40;
-                const randomX = Math.random() * ancho;
-                const randomY = Math.random() * alto;
-
-                btnSi2.classList.add('escapista');
-                btnSi2.style.left = `${randomX}px`;
-                btnSi2.style.top = `${randomY}px`;
-            }
-
-            btnSi2.addEventListener('mouseover', moverBotonSi2);
-            btnSi2.addEventListener('touchstart', moverBotonSi2);
+            
+            // --- CONFIGURACIÓN PREGUNTA 2 (Ambos se escapan, el NO activa el final) ---
+            hacerEscapista('btnSi2', finalizar);
+            hacerEscapista('btnNo2', finalizar);
         }
 
         // --- FINALIZACIÓN Y LANZAMIENTO DE SERPENTINAS ---
         function finalizar() {
-            // Ocultamos la pregunta 2
             document.getElementById('seccion2').classList.add('hidden');
-            // Mostramos el mensaje final
             document.getElementById('seccionFinal').classList.remove('hidden');
 
             // Lanzamiento de serpentinas y confeti masivo desde los costados
