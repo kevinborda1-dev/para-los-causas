@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pregunta</title>
+    <title>Preguntas Divertidas</title>
+    <!-- Librería externa para el efecto de serpentinas y confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -13,27 +15,35 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
-            overflow: hidden; /* Evita barras de desplazamiento al moverse el botón */
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 480px;
+            width: 90%;
+            position: relative;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
         }
 
         .botones {
             display: flex;
-            gap: 30px;
-            position: relative;
-            width: 100%;
-            max-width: 400px;
+            gap: 20px;
             justify-content: center;
             align-items: center;
-            height: 100px;
+            min-height: 80px;
+            position: relative;
         }
 
         button {
@@ -41,71 +51,145 @@
             font-size: 1.2rem;
             font-weight: bold;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.1s;
         }
 
-        #btnSi {
+        .btn-si {
             background-color: #2ecc71;
             color: white;
         }
 
-        #btnSi:hover {
+        .btn-si:hover {
             background-color: #27ae60;
         }
 
-        #btnNo {
+        .btn-no {
             background-color: #e74c3c;
             color: white;
-            position: absolute; /* Permite moverlo libremente por el contenedor/pantalla */
-            transition: transform 0.1s ease-out; /* Movimiento fluido */
+        }
+
+        .btn-no:hover {
+            background-color: #c0392b;
+        }
+
+        /* Clase para el botón que se escapa */
+        .escapista {
+            position: absolute !important;
+            transition: all 0.1s ease-out;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>¿Eres gay?</h1>
+    <div class="card">
+        <!-- PREGUNTA 1 -->
+        <div id="seccion1">
+            <h1>¿Eres gay?</h1>
+            <div class="botones" id="contenedor1">
+                <button class="btn-si" onclick="siguientePregunta()">SÍ</button>
+                <button class="btn-no" id="btnNo1">NO</button>
+            </div>
+        </div>
 
-    <div class="botones" id="contenedorBotones">
-        <button id="btnSi" onclick="alert('¡Sabía que dirías que sí! ❤️')">SÍ</button>
-        <button id="btnNo">NO</button>
+        <!-- PREGUNTA 2 -->
+        <div id="seccion2" class="hidden">
+            <h1>¿Y tu familia lo sabe?</h1>
+            <div class="botones" id="contenedor2">
+                <button class="btn-si" id="btnSi2">SÍ</button>
+                <button class="btn-no" onclick="finalizar()">NO</button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN FINAL -->
+        <div id="seccionFinal" class="hidden">
+            <h1 style="color: #27ae60; font-size: 2.2rem;">¡Felicidades saliste del closet!</h1>
+            <button class="btn-si" onclick="location.reload()" style="margin-top: 20px;">Volver a jugar</button>
+        </div>
     </div>
 
     <script>
-        const btnNo = document.getElementById('btnNo');
+        // --- CONFIGURACIÓN PREGUNTA 1 (Se escapa el NO) ---
+        const btnNo1 = document.getElementById('btnNo1');
+        
+        function moverBoton1(e) {
+            if (e) e.preventDefault();
+            const ancho = window.innerWidth - btnNo1.offsetWidth - 40;
+            const alto = window.innerHeight - btnNo1.offsetHeight - 40;
+            const randomX = Math.random() * ancho;
+            const randomY = Math.random() * alto;
 
-        function moverBoton() {
-            // Obtenemos las dimensiones de la ventana
-            const anchoVentana = window.innerWidth;
-            const altoVentana = window.innerHeight;
-
-            // Obtenemos el tamaño del botón
-            const anchoBoton = btnNo.offsetWidth;
-            const altoBoton = btnNo.offsetHeight;
-
-            // Margen de seguridad para que no quede pegado exactamente al borde
-            const margen = 50;
-
-            // Calculamos posiciones aleatorias dentro de la pantalla
-            const randomX = Math.random() * (anchoVentana - anchoBoton - margen * 2) + margen;
-            const randomY = Math.random() * (altoVentana - altoBoton - margen * 2) + margen;
-
-            // Aplicamos la nueva posición usando position absolute
-            btnNo.style.position = 'fixed';
-            btnNo.style.left = `${randomX}px`;
-            btnNo.style.top = `${randomY}px`;
+            btnNo1.classList.add('escapista');
+            btnNo1.style.left = `${randomX}px`;
+            btnNo1.style.top = `${randomY}px`;
         }
 
-        // Eventos para cuando el cursor pasa por encima (PC)
-        btnNo.addEventListener('mouseover', moverBoton);
+        btnNo1.addEventListener('mouseover', moverBoton1);
+        btnNo1.addEventListener('touchstart', moverBoton1);
 
-        // Eventos para pantallas táctiles (Celulares y tablets)
-        btnNo.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Evita que se registre el toque y active el botón
-            moverBoton();
-        });
+        // --- TRANSICIÓN A LA SEGUNDA PREGUNTA ---
+        function siguientePregunta() {
+            document.getElementById('seccion1').classList.add('hidden');
+            document.getElementById('seccion2').classList.remove('hidden');
+            configurarBotonSi2();
+        }
+
+        // --- CONFIGURACIÓN PREGUNTA 2 (Se escapa el SÍ) ---
+        function configurarBotonSi2() {
+            const btnSi2 = document.getElementById('btnSi2');
+
+            function moverBotonSi2(e) {
+                if (e) e.preventDefault();
+                const ancho = window.innerWidth - btnSi2.offsetWidth - 40;
+                const alto = window.innerHeight - btnSi2.offsetHeight - 40;
+                const randomX = Math.random() * ancho;
+                const randomY = Math.random() * alto;
+
+                btnSi2.classList.add('escapista');
+                btnSi2.style.left = `${randomX}px`;
+                btnSi2.style.top = `${randomY}px`;
+            }
+
+            btnSi2.addEventListener('mouseover', moverBotonSi2);
+            btnSi2.addEventListener('touchstart', moverBotonSi2);
+        }
+
+        // --- FINALIZACIÓN Y LANZAMIENTO DE SERPENTINAS ---
+        function finalizar() {
+            // Ocultamos la pregunta 2
+            document.getElementById('seccion2').classList.add('hidden');
+            // Mostramos el mensaje final
+            document.getElementById('seccionFinal').classList.remove('hidden');
+
+            // Lanzamiento de serpentinas y confeti masivo desde los costados
+            var duration = 3.5 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
     </script>
 
 </body>
