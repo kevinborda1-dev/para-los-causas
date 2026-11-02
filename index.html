@@ -88,6 +88,96 @@
         }
     </style>
 </head>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Divertidas</title>
+    <!-- Librería externa para el efecto de serpentinas y confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .botones {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+            position: relative;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        .btn-si {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-si:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-no {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-no:hover {
+            background-color: #c0392b;
+        }
+
+        /* Clase para el botón que da vueltas y se escapa por la pantalla */
+        .escapista {
+            position: fixed !important;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
 <body>
 
     <div class="card">
@@ -95,9 +185,7 @@
         <div id="seccion1">
             <h1>¿Eres gay?</h1>
             <div class="botones" id="contenedor1">
-                <!-- El SÍ responde de forma normal y avanza -->
                 <button class="btn-si" onclick="siguientePregunta()">SÍ</button>
-                <!-- El NO es el único que se escapa -->
                 <button class="btn-no" id="btnNo1">NO</button>
             </div>
         </div>
@@ -106,9 +194,7 @@
         <div id="seccion2" class="hidden">
             <h1>¿Y tu familia lo sabe?</h1>
             <div class="botones" id="contenedor2">
-                <!-- El SÍ es el único que se escapa -->
                 <button class="btn-si" id="btnSi2">SÍ</button>
-                <!-- El NO responde de forma normal y finaliza -->
                 <button class="btn-no" onclick="finalizar()">NO</button>
             </div>
         </div>
@@ -121,37 +207,41 @@
     </div>
 
     <script>
-        // Función para hacer que un botón se escape estrictamente dentro de los márgenes de la pantalla
+        // Función para hacer que el botón rote y se mueva por el contorno de la pantalla
         function configurarEscape(idBoton) {
             const btn = document.getElementById(idBoton);
 
             function mover(e) {
                 if (e) e.preventDefault();
                 
-                const margen = 20;
+                const margen = 30;
                 const anchoVentana = window.innerWidth;
                 const altoVentana = window.innerHeight;
                 
                 const anchoBoton = btn.offsetWidth;
                 const altoBoton = btn.offsetHeight;
 
-                // Límites exactos del contorno de la ventana restando el tamaño del botón y un margen
+                // Límites exactos dentro de la pantalla
                 const maxX = anchoVentana - anchoBoton - margen;
                 const maxY = altoVentana - altoBoton - margen;
 
                 const randomX = Math.max(margen, Math.random() * maxX);
                 const randomY = Math.max(margen, Math.random() * maxY);
+                
+                // Genera un giro aleatorio entre -30 y 30 grados para simular que da vueltas
+                const giroAleatorio = (Math.random() - 0.5) * 60;
 
                 btn.classList.add('escapista');
                 btn.style.left = `${randomX}px`;
                 btn.style.top = `${randomY}px`;
+                btn.style.transform = `rotate(${giroAleatorio}deg)`;
             }
 
             btn.addEventListener('mouseover', mover);
             btn.addEventListener('touchstart', mover);
         }
 
-        // --- ACTIVAR ESCAPE SOLO PARA EL BOTÓN "NO" DE LA PREGUNTA 1 ---
+        // --- ACTIVAR ESCAPE PARA LA PREGUNTA 1 ---
         configurarEscape('btnNo1');
 
         // --- TRANSICIÓN A LA SEGUNDA PREGUNTA ---
@@ -159,7 +249,7 @@
             document.getElementById('seccion1').classList.add('hidden');
             document.getElementById('seccion2').classList.remove('hidden');
             
-            // --- ACTIVAR ESCAPE SOLO PARA EL BOTÓN "SÍ" DE LA PREGUNTA 2 ---
+            // --- ACTIVAR ESCAPE PARA LA PREGUNTA 2 ---
             configurarEscape('btnSi2');
         }
 
