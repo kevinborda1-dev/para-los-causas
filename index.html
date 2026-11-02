@@ -29,6 +29,7 @@
             max-width: 480px;
             width: 90%;
             position: relative;
+            z-index: 10;
         }
 
         h1 {
@@ -75,10 +76,11 @@
             background-color: #c0392b;
         }
 
-        /* Clase para los botones que se escapan */
+        /* Clase para el botón que se escapa libremente por la pantalla */
         .escapista {
-            position: absolute !important;
+            position: fixed !important;
             transition: all 0.1s ease-out;
+            z-index: 1000;
         }
 
         .hidden {
@@ -93,7 +95,9 @@
         <div id="seccion1">
             <h1>¿Eres gay?</h1>
             <div class="botones" id="contenedor1">
-                <button class="btn-si" id="btnSi1">SÍ</button>
+                <!-- El SÍ responde de forma normal y avanza -->
+                <button class="btn-si" onclick="siguientePregunta()">SÍ</button>
+                <!-- El NO es el único que se escapa -->
                 <button class="btn-no" id="btnNo1">NO</button>
             </div>
         </div>
@@ -102,8 +106,10 @@
         <div id="seccion2" class="hidden">
             <h1>¿Y tu familia lo sabe?</h1>
             <div class="botones" id="contenedor2">
+                <!-- El SÍ es el único que se escapa -->
                 <button class="btn-si" id="btnSi2">SÍ</button>
-                <button class="btn-no" id="btnNo2">NO</button>
+                <!-- El NO responde de forma normal y finaliza -->
+                <button class="btn-no" onclick="finalizar()">NO</button>
             </div>
         </div>
 
@@ -115,16 +121,26 @@
     </div>
 
     <script>
-        // Función genérica para hacer que cualquier botón se escape
-        function hacerEscapista(idBoton, callbackAlDarClick) {
+        // Función para hacer que un botón se escape estrictamente dentro de los márgenes de la pantalla
+        function configurarEscape(idBoton) {
             const btn = document.getElementById(idBoton);
 
             function mover(e) {
                 if (e) e.preventDefault();
-                const ancho = window.innerWidth - btn.offsetWidth - 40;
-                const alto = window.innerHeight - btn.offsetHeight - 40;
-                const randomX = Math.random() * ancho;
-                const randomY = Math.random() * alto;
+                
+                const margen = 20;
+                const anchoVentana = window.innerWidth;
+                const altoVentana = window.innerHeight;
+                
+                const anchoBoton = btn.offsetWidth;
+                const altoBoton = btn.offsetHeight;
+
+                // Límites exactos del contorno de la ventana restando el tamaño del botón y un margen
+                const maxX = anchoVentana - anchoBoton - margen;
+                const maxY = altoVentana - altoBoton - margen;
+
+                const randomX = Math.max(margen, Math.random() * maxX);
+                const randomY = Math.max(margen, Math.random() * maxY);
 
                 btn.classList.add('escapista');
                 btn.style.left = `${randomX}px`;
@@ -133,25 +149,18 @@
 
             btn.addEventListener('mouseover', mover);
             btn.addEventListener('touchstart', mover);
-
-            // Por si milagrosamente logran hacerle clic/touch directo
-            if (callbackAlDarClick) {
-                btn.addEventListener('click', callbackAlDarClick);
-            }
         }
 
-        // --- CONFIGURACIÓN PREGUNTA 1 (Ambos se escapan, el SÍ avanza a la siguiente pregunta) ---
-        hacerEscapista('btnSi1', siguientePregunta);
-        hacerEscapista('btnNo1', siguientePregunta); // Si logran darle al No, también avanza por diversión
+        // --- ACTIVAR ESCAPE SOLO PARA EL BOTÓN "NO" DE LA PREGUNTA 1 ---
+        configurarEscape('btnNo1');
 
         // --- TRANSICIÓN A LA SEGUNDA PREGUNTA ---
         function siguientePregunta() {
             document.getElementById('seccion1').classList.add('hidden');
             document.getElementById('seccion2').classList.remove('hidden');
             
-            // --- CONFIGURACIÓN PREGUNTA 2 (Ambos se escapan, el NO activa el final) ---
-            hacerEscapista('btnSi2', finalizar);
-            hacerEscapista('btnNo2', finalizar);
+            // --- ACTIVAR ESCAPE SOLO PARA EL BOTÓN "SÍ" DE LA PREGUNTA 2 ---
+            configurarEscape('btnSi2');
         }
 
         // --- FINALIZACIÓN Y LANZAMIENTO DE SERPENTINAS ---
